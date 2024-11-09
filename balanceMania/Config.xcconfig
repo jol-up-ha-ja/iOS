@@ -1,0 +1,12 @@
+//
+//  Config.xcconfig
+//  balanceMania
+//
+//  Created by 반성준 on 10/26/24.
+//
+
+// Configuration settings file format documentation can be found at:
+// https://help.apple.com/xcode/#/dev745c5c974
+
+KAKAO_NATIVE_APP_KEY=051711b84a3fedf77ef33eea7934dd9b
+KAKAO_REST_API_KEY=652d477714618bb9a2a50ee848dd6ae3

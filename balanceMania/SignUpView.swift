@@ -6,37 +6,65 @@ struct SignUpView: View {
     @State private var birth: String = ""
     
     var body: some View {
-        VStack {
+        VStack(spacing: 20) {
+            // 타이틀
             Text("회원가입 정보 입력")
-                .font(.title)
-                .padding()
+                .font(.system(size: 28, weight: .bold, design: .rounded))
+                .foregroundColor(Color("AccentColor"))
+                .padding(.top, 30)
             
-            TextField("이름", text: $name)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .padding()
-            
-            Picker("성별", selection: $gender) {
-                Text("남성").tag("M")
-                Text("여성").tag("F")
+            // 이름 입력 필드
+            VStack(alignment: .leading, spacing: 5) {
+                Text("이름")
+                    .font(.subheadline)
+                    .foregroundColor(.gray)
+                TextField("이름을 입력하세요", text: $name)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .padding(.horizontal)
             }
-            .pickerStyle(SegmentedPickerStyle())
-            .padding()
             
-            TextField("생년월일 (YYYYMMDD)", text: $birth)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .keyboardType(.numberPad)
-                .padding()
+            // 성별 선택
+            VStack(alignment: .leading, spacing: 5) {
+                Text("성별")
+                    .font(.subheadline)
+                    .foregroundColor(.gray)
+                Picker("성별", selection: $gender) {
+                    Text("남성").tag("M")
+                    Text("여성").tag("F")
+                }
+                .pickerStyle(SegmentedPickerStyle())
+                .padding(.horizontal)
+            }
             
+            // 생년월일 입력 필드
+            VStack(alignment: .leading, spacing: 5) {
+                Text("생년월일")
+                    .font(.subheadline)
+                    .foregroundColor(.gray)
+                TextField("YYYYMMDD 형식으로 입력하세요", text: $birth)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .keyboardType(.numberPad)
+                    .padding(.horizontal)
+            }
+            
+            // 회원가입 완료 버튼
             Button(action: registerUser) {
                 Text("회원가입 완료")
+                    .font(.headline)
                     .padding()
+                    .frame(maxWidth: .infinity)
                     .background(Color.blue)
                     .foregroundColor(.white)
-                    .cornerRadius(8)
+                    .cornerRadius(10)
+                    .shadow(color: Color.blue.opacity(0.3), radius: 5, x: 0, y: 3)
             }
-            .padding()
+            .padding(.horizontal)
+            .padding(.top, 20)
+            
+            Spacer()
         }
         .padding()
+        .background(Color(.systemGroupedBackground).edgesIgnoringSafeArea(.all))
     }
     
     func registerUser() {
@@ -55,3 +83,4 @@ struct SignUpView: View {
         }
     }
 }
+

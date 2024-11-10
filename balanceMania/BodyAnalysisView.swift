@@ -14,8 +14,15 @@ struct BodyAnalysisView: View {
                 .font(.system(size: 32, weight: .bold, design: .rounded))
                 .foregroundColor(Color("AccentColor"))
                 .padding(.top, 40)
+                .shadow(color: Color.blue.opacity(0.3), radius: 5, x: 0, y: 3)
             
-            // 사진 촬영 버튼 섹션
+            // 이미지 선택 및 버튼 섹션
+            HStack(spacing: 20) {
+                ImageSelectionView(title: "정면 사진", image: frontImg)
+                ImageSelectionView(title: "측면 사진", image: sideImg)
+            }
+            .padding(.horizontal)
+            
             VStack(spacing: 15) {
                 CaptureButton(title: "정면 사진 촬영", color: .blue) {
                     currentCameraPosition = .front
@@ -35,10 +42,12 @@ struct BodyAnalysisView: View {
                     .font(.headline)
                     .padding()
                     .frame(maxWidth: .infinity)
-                    .background(Color.orange)
+                    .background(
+                        LinearGradient(gradient: Gradient(colors: [Color.orange, Color.red]), startPoint: .leading, endPoint: .trailing)
+                    )
                     .foregroundColor(.white)
                     .cornerRadius(12)
-                    .shadow(color: Color.orange.opacity(0.3), radius: 5, x: 0, y: 3)
+                    .shadow(color: Color.orange.opacity(0.4), radius: 5, x: 0, y: 3)
             }
             .padding(.horizontal)
             .padding(.top, 20)
@@ -47,6 +56,8 @@ struct BodyAnalysisView: View {
             if let result = analysisResult {
                 AnalysisResultView(result: result)
                     .padding()
+                    .transition(.opacity.combined(with: .slide))
+                    
             }
             
             Spacer()
@@ -88,6 +99,31 @@ struct BodyAnalysisView: View {
     }
 }
 
+// 이미지 선택 뷰 컴포넌트
+struct ImageSelectionView: View {
+    var title: String
+    var image: UIImage?
+    
+    var body: some View {
+        VStack {
+            if let image = image {
+                Image(uiImage: image)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: 120, height: 120)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.gray.opacity(0.5), lineWidth: 2))
+            } else {
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color.gray.opacity(0.3))
+                    .frame(width: 120, height: 120)
+                    .overlay(Text(title).foregroundColor(.gray))
+            }
+        }
+        .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 3)
+    }
+}
+
 // 버튼 컴포넌트
 struct CaptureButton: View {
     var title: String
@@ -96,14 +132,19 @@ struct CaptureButton: View {
     
     var body: some View {
         Button(action: action) {
-            Text(title)
-                .font(.headline)
-                .padding()
-                .frame(maxWidth: .infinity)
-                .background(color)
-                .foregroundColor(.white)
-                .cornerRadius(12)
-                .shadow(color: color.opacity(0.3), radius: 5, x: 0, y: 3)
+            HStack {
+                Image(systemName: "camera.fill")
+                    .foregroundColor(.white)
+                    .font(.headline)
+                Text(title)
+                    .font(.headline)
+                    .foregroundColor(.white)
+            }
+            .padding()
+            .frame(maxWidth: .infinity)
+            .background(color)
+            .cornerRadius(12)
+            .shadow(color: color.opacity(0.3), radius: 5, x: 0, y: 3)
         }
     }
 }

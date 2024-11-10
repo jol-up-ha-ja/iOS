@@ -2,9 +2,11 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+    <!-- Kakao SDK의 네이티브 앱 키 -->
     <key>KAKAO_NATIVE_APP_KEY</key>
-    <string>${KAKAO_NATIVE_APP_KEY}</string>
+    <string>051711b84a3fedf77ef33eea7934dd9b</string>
     
+    <!-- URL Scheme 설정 -->
     <key>CFBundleURLTypes</key>
     <array>
         <dict>
@@ -12,11 +14,12 @@
             <string>Editor</string>
             <key>CFBundleURLSchemes</key>
             <array>
-                <string>kakao${KAKAO_NATIVE_APP_KEY}</string>
+                <string>kakao051711b84a3fedf77ef33eea7934dd9b</string>
             </array>
         </dict>
     </array>
-    
+
+    <!-- 앱 화면 구성 설정 -->
     <key>UIApplicationSceneManifest</key>
     <dict>
         <key>UIApplicationSupportsMultipleScenes</key>
@@ -30,25 +33,23 @@
                     <string>Default Configuration</string>
                     <key>UISceneDelegateClassName</key>
                     <string>$(PRODUCT_MODULE_NAME).SceneDelegate</string>
-                    <key>UISceneStoryboardFile</key>
-                    <string>Main</string>
                 </dict>
             </array>
         </dict>
     </dict>
-    
+
+    <!-- Kakao SDK를 위한 Query Schemes 추가 -->
     <key>LSApplicationQueriesSchemes</key>
     <array>
         <string>kakaokompassauth</string>
         <string>kakaolink</string>
     </array>
-    
+
+    <!-- 네트워크 보안 설정 -->
     <key>NSAppTransportSecurity</key>
     <dict>
         <key>NSAllowsArbitraryLoads</key>
         <false/>
-        
-        <!-- 예외 처리할 도메인 설정 -->
         <key>NSExceptionDomains</key>
         <dict>
             <key>13.125.96.48</key>
@@ -64,5 +65,25 @@
             </dict>
         </dict>
     </dict>
+
+    <!-- 사용자 권한 요청 설명 -->
+    <key>NSCameraUsageDescription</key>
+    <string>이 앱은 사진 촬영을 위해 카메라 접근이 필요합니다.</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>사진을 저장하고 불러오기 위해 사진 라이브러리 접근이 필요합니다.</string>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>위치 기반 서비스를 위해 위치 접근이 필요합니다.</string>
+
+    <!-- 앱 이름, 번들 설정 -->
+    <key>CFBundleName</key>
+    <string>balanceMania</string>
+    <key>CFBundleDisplayName</key>
+    <string>Balance Mania</string>
+    <key>CFBundleIdentifier</key>
+    <string>com.yourdomain.balanceMania</string>
+    <key>CFBundleVersion</key>
+    <string>1.0</string>
+    <key>CFBundleShortVersionString</key>
+    <string>1.0</string>
 </dict>
 </plist>

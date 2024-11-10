@@ -19,15 +19,17 @@ struct MainView: View {
                         Text("BalanceMania")
                             .font(.system(size: 36, weight: .bold, design: .rounded))
                             .foregroundColor(.white)
-                            .shadow(radius: 3)
+                            .shadow(color: Color.black.opacity(0.3), radius: 5, x: 0, y: 3)
+                            .padding(.top, 40)
+                            .scaleEffect(1.05)
+                           
                         
                         Text("건강한 삶을 위한 체형 분석 서비스")
                             .font(.subheadline)
-                            .foregroundColor(.white.opacity(0.75))
+                            .foregroundColor(.white.opacity(0.8))
                             .padding(.horizontal, 30)
                             .multilineTextAlignment(.center)
                     }
-                    .padding(.top, 40)
                     
                     // 기능 버튼 섹션
                     VStack(spacing: 20) {
@@ -88,9 +90,14 @@ struct MainFeatureButton<Destination: View>: View {
     var body: some View {
         NavigationLink(destination: destination) {
             HStack(spacing: 15) {
-                Image(systemName: iconName)
-                    .font(.system(size: 22, weight: .bold))
-                    .foregroundColor(.white)
+                ZStack {
+                    Circle()
+                        .fill(backgroundColor.opacity(0.2))
+                        .frame(width: 44, height: 44)
+                    Image(systemName: iconName)
+                        .font(.system(size: 20, weight: .bold))
+                        .foregroundColor(.white)
+                }
                 
                 Text(title)
                     .font(.system(size: 18, weight: .bold))

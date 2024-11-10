@@ -45,19 +45,12 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		386049942CCCF14B009E6686 /* Exceptions for "balanceMania" folder in "balanceManiaTests" target */ = {
+		38B72CEA2CE075A40039305E /* Exceptions for "balanceMania" folder in "balanceMania" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Config.xcconfig,
 			);
-			target = 386049722CCCF12D009E6686 /* balanceManiaTests */;
-		};
-		386049952CCCF14B009E6686 /* Exceptions for "balanceMania" folder in "balanceManiaUITests" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Config.xcconfig,
-			);
-			target = 3860497C2CCCF12D009E6686 /* balanceManiaUITests */;
+			target = 386049622CCCF12C009E6686 /* balanceMania */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -65,8 +58,7 @@
 		386049652CCCF12C009E6686 /* balanceMania */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				386049942CCCF14B009E6686 /* Exceptions for "balanceMania" folder in "balanceManiaTests" target */,
-				386049952CCCF14B009E6686 /* Exceptions for "balanceMania" folder in "balanceManiaUITests" target */,
+				38B72CEA2CE075A40039305E /* Exceptions for "balanceMania" folder in "balanceMania" target */,
 			);
 			path = balanceMania;
 			sourceTree = "<group>";
@@ -231,7 +223,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1600;
-				LastUpgradeCheck = 1600;
+				LastUpgradeCheck = 1610;
 				TargetAttributes = {
 					386049622CCCF12C009E6686 = {
 						CreatedOnToolsVersion = 16.0;

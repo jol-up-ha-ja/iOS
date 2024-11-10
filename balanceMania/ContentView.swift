@@ -94,7 +94,7 @@ struct ContentView: View {
         if let error = error {
             print("카카오 로그인 실패: \(error.localizedDescription)")
             loginStatus = "로그인 실패"
-        } else if let oauthToken = oauthToken {
+        } else if oauthToken != nil {
             print("카카오 로그인 성공")
             loginStatus = "로그인 성공"
             self.showMainView = true // 로그인 성공 시 메인 화면으로 전환

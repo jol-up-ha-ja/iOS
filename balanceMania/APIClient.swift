@@ -20,7 +20,6 @@ enum APIError: Error, LocalizedError {
 
 class APIClient {
     
-    // MARK: - General Request 메서드
     static func request<T: Decodable>(
         endpoint: String,
         method: HTTPMethod,
@@ -82,3 +81,4 @@ class APIClient {
         }.resume()
     }
 }
+

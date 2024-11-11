@@ -71,19 +71,5 @@
     <string>이 앱은 사진 촬영을 위해 카메라 접근이 필요합니다.</string>
     <key>NSPhotoLibraryUsageDescription</key>
     <string>사진을 저장하고 불러오기 위해 사진 라이브러리 접근이 필요합니다.</string>
-    <key>NSLocationWhenInUseUsageDescription</key>
-    <string>위치 기반 서비스를 위해 위치 접근이 필요합니다.</string>
-
-    <!-- 앱 이름, 번들 설정 -->
-    <key>CFBundleName</key>
-    <string>balanceMania</string>
-    <key>CFBundleDisplayName</key>
-    <string>Balance Mania</string>
-    <key>CFBundleIdentifier</key>
-    <string>com.yourdomain.balanceMania</string>
-    <key>CFBundleVersion</key>
-    <string>1.0</string>
-    <key>CFBundleShortVersionString</key>
-    <string>1.0</string>
 </dict>
 </plist>

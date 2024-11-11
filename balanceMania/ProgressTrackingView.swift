@@ -1,3 +1,5 @@
+// ProgressTrackingView.swift
+
 import SwiftUI
 
 struct ProgressTrackingView: View {
@@ -6,20 +8,17 @@ struct ProgressTrackingView: View {
 
     var body: some View {
         VStack(spacing: 30) {
-            // 타이틀
             Text("진행 상황 추적")
                 .font(.system(size: 32, weight: .bold, design: .rounded))
                 .foregroundColor(Color("AccentColor"))
                 .padding(.top, 40)
             
             if isLoading {
-                // 로딩 중일 때 표시
                 ProgressView("진행 상황을 불러오는 중...")
                     .progressViewStyle(CircularProgressViewStyle(tint: .blue))
                     .foregroundColor(.gray)
                     .padding()
             } else if let data = progressData {
-                // 진행률과 업데이트 정보 표시
                 VStack(spacing: 20) {
                     Text("진행률")
                         .font(.headline)
@@ -70,7 +69,6 @@ struct ProgressTrackingView: View {
                 switch result {
                 case .success(let data):
                     self.progressData = data
-                    print("진행 상황 데이터: \(data)")
                 case .failure(let error):
                     print("진행 상황 데이터 로드 실패: \(error)")
                 }
@@ -79,7 +77,6 @@ struct ProgressTrackingView: View {
     }
 }
 
-// 진행률을 원형으로 표시하는 서브 뷰
 struct ProgressCircleView: View {
     var progress: Int
     

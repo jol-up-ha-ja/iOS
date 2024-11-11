@@ -1,14 +1,9 @@
-//
-//  S3PresignedUrlResponse.swift
-//  balanceMania
-//
-//  Created by 반성준 on 11/8/24.
-//
+// S3PresignedUrlResponse.swift
 
 import Foundation
 
+// S3 Presigned URL 응답을 위한 데이터 모델
 struct S3PresignedUrlResponse: Decodable {
     let url: String
-    let exp: String
     let key: String
 }

@@ -1,3 +1,5 @@
+// ImprovementGuideView.swift
+
 import SwiftUI
 
 struct ImprovementGuideView: View {
@@ -6,7 +8,6 @@ struct ImprovementGuideView: View {
     
     var body: some View {
         VStack {
-            // 타이틀
             Text("개선 가이드")
                 .font(.system(size: 28, weight: .bold, design: .rounded))
                 .foregroundColor(Color("AccentColor"))
@@ -18,7 +19,6 @@ struct ImprovementGuideView: View {
                     .padding()
                     .foregroundColor(.gray)
             } else {
-                // 가이드 목록
                 ScrollView {
                     LazyVStack(spacing: 20) {
                         ForEach(guideList) { guide in
@@ -34,7 +34,6 @@ struct ImprovementGuideView: View {
         .background(Color(.systemGroupedBackground).edgesIgnoringSafeArea(.all))
     }
     
-    // 서버에서 운동 가이드 목록 불러오기
     func fetchImprovementGuides() {
         let endpoint = "http://13.125.96.48/api/v1/guides/improvements"
         
@@ -44,7 +43,6 @@ struct ImprovementGuideView: View {
                 case .success(let guides):
                     self.guideList = guides
                     self.isLoading = false
-                    print("개선 가이드 불러오기 성공: \(guides)")
                 case .failure(let error):
                     print("개선 가이드 불러오기 실패: \(error)")
                     self.isLoading = false
@@ -54,7 +52,6 @@ struct ImprovementGuideView: View {
     }
 }
 
-// 운동 가이드 카드 뷰 컴포넌트
 struct GuideCardView: View {
     var guide: ExerciseGuide
     
@@ -83,13 +80,4 @@ struct GuideCardView: View {
                 .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 3)
         )
     }
-}
-
-// 운동 가이드 데이터 모델
-struct ExerciseGuide: Identifiable, Decodable {
-    let id: Int
-    let name: String
-    let description: String
-    let repetitions: Int
-    let duration: Int
 }

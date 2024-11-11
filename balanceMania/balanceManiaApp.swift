@@ -1,9 +1,4 @@
-//
-//  balanceManiaApp.swift
-//  balanceMania
-//
-//  Created by 반성준 on 10/26/24.
-//
+// balanceManiaApp.swift
 
 import SwiftUI
 import KakaoSDKCommon
@@ -21,12 +16,16 @@ struct balanceManiaApp: App {
         WindowGroup {
             ContentView()
                 .onOpenURL { url in
-                    // URL이 KakaoSDK의 로그인 요청에서 온 경우 처리
                     if AuthApi.isKakaoTalkLoginUrl(url) {
-                        AuthController.handleOpenUrl(url: url)
+                        // 성공 여부 확인 후 로그 남기기
+                        let handled = AuthController.handleOpenUrl(url: url)
+                        if handled {
+                            print("Kakao login URL handled successfully.")
+                        } else {
+                            print("Failed to handle Kakao login URL.")
+                        }
                     }
                 }
         }
     }
 }
-

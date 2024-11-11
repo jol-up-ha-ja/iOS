@@ -1,35 +1,26 @@
 import Foundation
 
 enum HTTPMethod: String {
-    case GET
-    case POST
-    case DELETE
+    case GET, POST, PUT, DELETE
 }
 
 enum APIError: Error, LocalizedError {
-    case invalidURL
-    case noData
-    case decodingError
-    case serverError(statusCode: Int)
-    case custom(message: String)
+    case invalidURL, noData, decodingError, serverError(statusCode: Int), custom(message: String)
     
     var errorDescription: String? {
         switch self {
-        case .invalidURL:
-            return "The URL is invalid."
-        case .noData:
-            return "No data received from the server."
-        case .decodingError:
-            return "Failed to decode the response."
-        case .serverError(let statusCode):
-            return "Server returned an error with status code: \(statusCode)."
-        case .custom(let message):
-            return message
+        case .invalidURL: return "The URL is invalid."
+        case .noData: return "No data received from the server."
+        case .decodingError: return "Failed to decode the response."
+        case .serverError(let statusCode): return "Server error with status code: \(statusCode)."
+        case .custom(let message): return message
         }
     }
 }
 
 class APIClient {
+    
+    // MARK: - General Request 메서드
     static func request<T: Decodable>(
         endpoint: String,
         method: HTTPMethod,
@@ -68,18 +59,7 @@ class APIClient {
             }
 
             guard let httpResponse = response as? HTTPURLResponse else {
-                completion(.failure(APIError.custom(message: "Invalid response from server.")))
-                return
-            }
-
-            if httpResponse.statusCode == 401 {
-                AuthManager.shared.refreshToken { success in
-                    if success {
-                        self.request(endpoint: endpoint, method: method, body: body, headers: headers, completion: completion)
-                    } else {
-                        completion(.failure(APIError.serverError(statusCode: httpResponse.statusCode)))
-                    }
-                }
+                completion(.failure(APIError.custom(message: "Invalid server response.")))
                 return
             }
 

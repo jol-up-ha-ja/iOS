@@ -1,3 +1,4 @@
+//AuthManager
 import Foundation
 import KakaoSDKAuth
 import KakaoSDKUser
@@ -8,7 +9,7 @@ class AuthManager: ObservableObject {
     @Published var loginStatus: String = "로그인 필요"
     @Published var accessToken: String?
 
-    init() {
+    private init() {  // 싱글톤 패턴이므로 private init
         self.accessToken = UserDefaults.standard.string(forKey: "accessToken")
         self.loginStatus = accessToken != nil ? "로그인 완료" : "로그인 필요"
     }

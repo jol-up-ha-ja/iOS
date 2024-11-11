@@ -89,7 +89,7 @@ struct LoginView: View {
 // Preview 설정
 struct LoginView_Previews: PreviewProvider {
     static var previews: some View {
-        LoginView(authManager: AuthManager())
+        LoginView(authManager: AuthManager.shared)
             .previewDevice("iPhone 12")
             .environment(\.colorScheme, .dark)
     }

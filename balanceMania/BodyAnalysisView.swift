@@ -1,22 +1,24 @@
 import SwiftUI
+import UIKit
+import KakaoSDKAuth
 
 struct BodyAnalysisView: View {
     @State private var frontImg: UIImage?
     @State private var sideImg: UIImage?
     @State private var analysisResult: AnalysisResult?
     @State private var showImagePicker = false
+    @State private var sourceType: UIImagePickerController.SourceType = .camera
     @State private var currentCameraPosition: CameraPosition = .front
+    @State private var accessToken: String? // Access Token 상태 관리
     
     var body: some View {
         VStack(spacing: 30) {
-            // 타이틀 영역
             Text("체형 분석")
                 .font(.system(size: 32, weight: .bold, design: .rounded))
                 .foregroundColor(Color("AccentColor"))
                 .padding(.top, 40)
                 .shadow(color: Color.blue.opacity(0.3), radius: 5, x: 0, y: 3)
             
-            // 이미지 선택 및 버튼 섹션
             HStack(spacing: 20) {
                 ImageSelectionView(title: "정면 사진", image: frontImg)
                 ImageSelectionView(title: "측면 사진", image: sideImg)
@@ -24,19 +26,34 @@ struct BodyAnalysisView: View {
             .padding(.horizontal)
             
             VStack(spacing: 15) {
-                CaptureButton(title: "정면 사진 촬영", color: .blue) {
-                    currentCameraPosition = .front
-                    showImagePicker = true
+                HStack {
+                    CaptureButton(title: "정면 사진 촬영", color: .blue) {
+                        currentCameraPosition = .front
+                        sourceType = .camera
+                        showImagePicker = true
+                    }
+                    CaptureButton(title: "정면 사진 선택", color: .blue) {
+                        currentCameraPosition = .front
+                        sourceType = .photoLibrary
+                        showImagePicker = true
+                    }
                 }
                 
-                CaptureButton(title: "측면 사진 촬영", color: .green) {
-                    currentCameraPosition = .side
-                    showImagePicker = true
+                HStack {
+                    CaptureButton(title: "측면 사진 촬영", color: .green) {
+                        currentCameraPosition = .side
+                        sourceType = .camera
+                        showImagePicker = true
+                    }
+                    CaptureButton(title: "측면 사진 선택", color: .green) {
+                        currentCameraPosition = .side
+                        sourceType = .photoLibrary
+                        showImagePicker = true
+                    }
                 }
             }
             .padding(.horizontal)
             
-            // 분석 시작 버튼
             Button(action: analyzeBody) {
                 Text("분석 시작")
                     .font(.headline)
@@ -52,12 +69,10 @@ struct BodyAnalysisView: View {
             .padding(.horizontal)
             .padding(.top, 20)
             
-            // 분석 결과 표시 영역
             if let result = analysisResult {
                 AnalysisResultView(result: result)
                     .padding()
                     .transition(.opacity.combined(with: .slide))
-                    
             }
             
             Spacer()
@@ -65,148 +80,77 @@ struct BodyAnalysisView: View {
         .padding(.bottom, 40)
         .background(Color(.systemGroupedBackground).edgesIgnoringSafeArea(.all))
         .sheet(isPresented: $showImagePicker) {
-            ImagePicker(selectedImage: currentCameraPosition == .front ? $frontImg : $sideImg, sourceType: .camera)
+            ImagePicker(selectedImage: currentCameraPosition == .front ? $frontImg : $sideImg, sourceType: sourceType)
+        }
+        .onAppear {
+            fetchAccessToken()
+        }
+    }
+
+    // Access Token 가져오기
+    func fetchAccessToken() {
+        if let token = TokenManager.manager.getToken()?.accessToken {
+            accessToken = token
+            print("Access Token 가져오기 성공: \(token)")
+        } else {
+            print("Access Token을 가져오는 데 실패했습니다.")
         }
     }
 
     func analyzeBody() {
         guard let frontImageData = frontImg?.jpegData(compressionQuality: 0.8),
-              let sideImageData = sideImg?.jpegData(compressionQuality: 0.8) else {
-            print("이미지가 없습니다.")
+              let sideImageData = sideImg?.jpegData(compressionQuality: 0.8),
+              let token = accessToken else {
+            print("이미지 또는 Access Token이 없습니다.")
             return
         }
-
-        let frontImageKey = uploadImageToServer(imageData: frontImageData)
-        let sideImageKey = uploadImageToServer(imageData: sideImageData)
-
-        let endpoint = "http://13.125.96.48/api/v1/balances"
-        let body = AnalysisRequest(frontImgKey: frontImageKey, sideImgKey: sideImageKey, leftWeight: 0, rightWeight: 0)
-
-        APIClient.request(endpoint: endpoint, method: .POST, body: body) { (result: Result<AnalysisResult, Error>) in
-            switch result {
-            case .success(let analysis):
-                self.analysisResult = analysis
-                print("체형 분석 결과: \(analysis)")
+        
+        // 정면 이미지 Presigned URL 요청 및 업로드
+        APIClient.getPresignedURL(imgType: "jpg", accessToken: token) { frontResult in
+            switch frontResult {
+            case .success(let frontPresignedResponse):
+                APIClient.uploadImage(data: frontImageData, to: frontPresignedResponse.url) { frontUploadResult in
+                    switch frontUploadResult {
+                    case .success:
+                        // 측면 이미지 Presigned URL 요청 및 업로드
+                        APIClient.getPresignedURL(imgType: "jpg", accessToken: token) { sideResult in
+                            switch sideResult {
+                            case .success(let sidePresignedResponse):
+                                APIClient.uploadImage(data: sideImageData, to: sidePresignedResponse.url) { sideUploadResult in
+                                    switch sideUploadResult {
+                                    case .success:
+                                        // 서버에 분석 요청
+                                        let endpoint = "http://13.125.96.48/api/v1/balances"
+                                        let body = AnalysisRequest(
+                                            frontImgKey: frontPresignedResponse.key,
+                                            sideImgKey: sidePresignedResponse.key,
+                                            leftWeight: 0,
+                                            rightWeight: 0
+                                        )
+                                        APIClient.request(endpoint: endpoint, method: .POST, body: body) { (result: Result<AnalysisResult, Error>) in
+                                            switch result {
+                                            case .success(let analysis):
+                                                self.analysisResult = analysis
+                                                print("체형 분석 결과: \(analysis)")
+                                            case .failure(let error):
+                                                print("체형 분석 실패: \(error)")
+                                            }
+                                        }
+                                    case .failure(let error):
+                                        print("측면 이미지 업로드 실패: \(error)")
+                                    }
+                                }
+                            case .failure(let error):
+                                print("측면 Presigned URL 발급 실패: \(error)")
+                            }
+                        }
+                    case .failure(let error):
+                        print("정면 이미지 업로드 실패: \(error)")
+                    }
+                }
             case .failure(let error):
-                print("체형 분석 실패: \(error)")
+                print("정면 Presigned URL 발급 실패: \(error)")
             }
         }
     }
-    
-    func uploadImageToServer(imageData: Data) -> String {
-        // 서버에 이미지를 업로드하고 이미지 키를 반환
-        return "이미지_키_예시"
-    }
-}
-
-// 이미지 선택 뷰 컴포넌트
-struct ImageSelectionView: View {
-    var title: String
-    var image: UIImage?
-    
-    var body: some View {
-        VStack {
-            if let image = image {
-                Image(uiImage: image)
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: 120, height: 120)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.gray.opacity(0.5), lineWidth: 2))
-            } else {
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(Color.gray.opacity(0.3))
-                    .frame(width: 120, height: 120)
-                    .overlay(Text(title).foregroundColor(.gray))
-            }
-        }
-        .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 3)
-    }
-}
-
-// 버튼 컴포넌트
-struct CaptureButton: View {
-    var title: String
-    var color: Color
-    var action: () -> Void
-    
-    var body: some View {
-        Button(action: action) {
-            HStack {
-                Image(systemName: "camera.fill")
-                    .foregroundColor(.white)
-                    .font(.headline)
-                Text(title)
-                    .font(.headline)
-                    .foregroundColor(.white)
-            }
-            .padding()
-            .frame(maxWidth: .infinity)
-            .background(color)
-            .cornerRadius(12)
-            .shadow(color: color.opacity(0.3), radius: 5, x: 0, y: 3)
-        }
-    }
-}
-
-// 분석 결과 뷰 컴포넌트
-struct AnalysisResultView: View {
-    var result: AnalysisResult
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text("분석 결과")
-                .font(.headline)
-                .foregroundColor(.gray)
-                .padding(.bottom, 5)
-            
-            ResultRow(label: "어깨 각도", value: "\(result.frontShoulderAngle)도")
-            ResultRow(label: "골반 각도", value: "\(result.frontPelvisAngle)도")
-            ResultRow(label: "무릎 각도", value: "\(result.frontKneeAngle)도")
-            ResultRow(label: "목 각도", value: "\(result.sideNeckAngle)도")
-        }
-        .padding()
-        .background(Color.white)
-        .cornerRadius(12)
-        .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 3)
-    }
-}
-
-// 분석 결과 행
-struct ResultRow: View {
-    var label: String
-    var value: String
-    
-    var body: some View {
-        HStack {
-            Text(label)
-                .font(.body)
-                .foregroundColor(.secondary)
-            Spacer()
-            Text(value)
-                .font(.body)
-                .bold()
-                .foregroundColor(Color("AccentColor"))
-        }
-    }
-}
-
-// 데이터 모델
-enum CameraPosition {
-    case front, side
-}
-
-struct AnalysisRequest: Encodable {
-    let frontImgKey: String
-    let sideImgKey: String
-    let leftWeight: Int
-    let rightWeight: Int
-}
-
-struct AnalysisResult: Decodable {
-    let frontShoulderAngle: Int
-    let frontPelvisAngle: Int
-    let frontKneeAngle: Int
-    let sideNeckAngle: Int
-    let sideBodyAngle: Int
 }

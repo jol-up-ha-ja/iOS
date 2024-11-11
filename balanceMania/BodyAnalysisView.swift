@@ -1,6 +1,8 @@
 import SwiftUI
 import UIKit
 import KakaoSDKAuth
+import KakaoSDKUser
+import KakaoSDKCommon  // 추가: SdkError를 사용하기 위해 필요
 
 struct BodyAnalysisView: View {
     @State private var frontImg: UIImage?
@@ -9,7 +11,7 @@ struct BodyAnalysisView: View {
     @State private var showImagePicker = false
     @State private var sourceType: UIImagePickerController.SourceType = .camera
     @State private var currentCameraPosition: CameraPosition = .front
-    @State private var accessToken: String? // Access Token 상태 관리
+    @State private var accessToken: String?
     
     var body: some View {
         VStack(spacing: 30) {
@@ -83,43 +85,69 @@ struct BodyAnalysisView: View {
             ImagePicker(selectedImage: currentCameraPosition == .front ? $frontImg : $sideImg, sourceType: sourceType)
         }
         .onAppear {
-            fetchAccessToken()
+            checkAccessToken()
+        }
+    }
+    
+    // Access Token 유효성 검사 및 토큰 갱신
+    func checkAccessToken() {
+        UserApi.shared.accessTokenInfo { _, error in
+            if let error = error as? SdkError, error.isInvalidTokenError() {
+                print("유효하지 않은 Access Token, 토큰 갱신을 시도합니다.")
+                refreshToken()
+            } else if let error = error {
+                print("Access Token 검사 실패: \(error.localizedDescription)")
+            } else {
+                print("유효한 Access Token이 확인되었습니다.")
+                accessToken = TokenManager.manager.getToken()?.accessToken
+            }
         }
     }
 
-    // Access Token 가져오기
-    func fetchAccessToken() {
-        if let token = TokenManager.manager.getToken()?.accessToken {
-            accessToken = token
-            print("Access Token 가져오기 성공: \(token)")
-        } else {
-            print("Access Token을 가져오는 데 실패했습니다.")
+    func refreshToken() {
+        AuthApi.shared.refreshToken { oauthToken, error in
+            if let error = error {
+                print("토큰 갱신 실패: \(error.localizedDescription), 로그인을 재시도합니다.")
+                initiateKakaoLogin()
+            } else if let oauthToken = oauthToken {
+                accessToken = oauthToken.accessToken
+                print("새로 발급된 Access Token: \(oauthToken.accessToken)")
+            }
         }
     }
 
+    func initiateKakaoLogin() {
+        UserApi.shared.loginWithKakaoAccount { oauthToken, error in
+            if let error = error {
+                print("카카오 로그인 실패: \(error.localizedDescription)")
+            } else if let oauthToken = oauthToken {
+                accessToken = oauthToken.accessToken
+                print("카카오 로그인 성공. Access Token: \(oauthToken.accessToken)")
+            }
+        }
+    }
+    
+    // 분석 요청 함수
     func analyzeBody() {
         guard let frontImageData = frontImg?.jpegData(compressionQuality: 0.8),
               let sideImageData = sideImg?.jpegData(compressionQuality: 0.8),
-              let token = accessToken else {
+              let _ = accessToken else {
             print("이미지 또는 Access Token이 없습니다.")
             return
         }
         
-        // 정면 이미지 Presigned URL 요청 및 업로드
-        APIClient.getPresignedURL(imgType: "jpg", accessToken: token) { frontResult in
+        APIClient.getPresignedURL(imgType: "jpg") { frontResult in
             switch frontResult {
             case .success(let frontPresignedResponse):
                 APIClient.uploadImage(data: frontImageData, to: frontPresignedResponse.url) { frontUploadResult in
                     switch frontUploadResult {
                     case .success:
-                        // 측면 이미지 Presigned URL 요청 및 업로드
-                        APIClient.getPresignedURL(imgType: "jpg", accessToken: token) { sideResult in
+                        APIClient.getPresignedURL(imgType: "jpg") { sideResult in
                             switch sideResult {
                             case .success(let sidePresignedResponse):
                                 APIClient.uploadImage(data: sideImageData, to: sidePresignedResponse.url) { sideUploadResult in
                                     switch sideUploadResult {
                                     case .success:
-                                        // 서버에 분석 요청
                                         let endpoint = "http://13.125.96.48/api/v1/balances"
                                         let body = AnalysisRequest(
                                             frontImgKey: frontPresignedResponse.key,

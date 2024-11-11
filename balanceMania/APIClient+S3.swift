@@ -1,7 +1,9 @@
 import Foundation
 
-
 extension APIClient {
+    
+    private static var refreshInProgress = false
+    private static var pendingRequests: [(Result<S3PresignedUrlResponse, Error>) -> Void] = []
     
     // MARK: - Presigned URL 요청 메서드
     static func getPresignedURL(imgType: String = "jpg", completion: @escaping (Result<S3PresignedUrlResponse, Error>) -> Void) {
@@ -26,14 +28,7 @@ extension APIClient {
             
             if httpResponse.statusCode == 400 {
                 print("❌ Presigned URL 요청 실패 - 상태 코드: 400 (유효하지 않은 토큰)")
-                refreshToken { result in
-                    switch result {
-                    case .success:
-                        getPresignedURL(imgType: imgType, completion: completion) // 갱신 후 재요청
-                    case .failure(let error):
-                        completion(.failure(error))
-                    }
-                }
+                handleTokenRefresh(imgType: imgType, completion: completion)
                 return
             }
             
@@ -51,6 +46,31 @@ extension APIClient {
         }.resume()
     }
     
+    private static func handleTokenRefresh(imgType: String, completion: @escaping (Result<S3PresignedUrlResponse, Error>) -> Void) {
+        if refreshInProgress {
+            pendingRequests.append(completion)
+            return
+        }
+
+        refreshInProgress = true
+        pendingRequests.append(completion)
+        
+        refreshToken { result in
+            refreshInProgress = false
+
+            switch result {
+            case .success:
+                getPresignedURL(imgType: imgType, completion: { result in
+                    pendingRequests.forEach { $0(result) }
+                    pendingRequests.removeAll()
+                })
+            case .failure(let error):
+                pendingRequests.forEach { $0(.failure(error)) }
+                pendingRequests.removeAll()
+            }
+        }
+    }
+
     // MARK: - Presigned URL로 이미지 업로드 메서드
     static func uploadImage(data: Data, to presignedURL: String, completion: @escaping (Result<Void, Error>) -> Void) {
         guard let uploadURL = URL(string: presignedURL) else {
@@ -125,3 +145,4 @@ extension APIClient {
         }.resume()
     }
 }
+

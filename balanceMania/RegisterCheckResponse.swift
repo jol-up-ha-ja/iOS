@@ -1,3 +1,4 @@
+//RegisterCheckResponse.swift
 import Foundation
 
 struct RegisterCheckResponse: Decodable {

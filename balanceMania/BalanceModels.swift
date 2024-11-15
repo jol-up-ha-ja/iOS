@@ -1,3 +1,4 @@
+// BalanceModels.swift
 import Foundation
 
 // 균형 정보 모델
@@ -14,22 +15,20 @@ struct BalanceInfo: Decodable {
     let createdAt: String?
     let modifiedAt: String?
 
-    // CodingKeys로 JSON 키와 구조체 필드를 명시적으로 매핑
     enum CodingKeys: String, CodingKey {
         case id
-        case frontShoulderAngle = "frontShoulderAngle"
-        case frontPelvisAngle = "frontPelvisAngle"
-        case frontKneeAngle = "frontKneeAngle"
-        case frontAnkleAngle = "frontAnkleAngle"
-        case sideNeckAngle = "sideNeckAngle"
-        case sideBodyAngle = "sideBodyAngle"
-        case leftWeight = "leftWeight"
-        case rightWeight = "rightWeight"
-        case createdAt = "createdAt"
-        case modifiedAt = "modifiedAt"
+        case frontShoulderAngle
+        case frontPelvisAngle
+        case frontKneeAngle
+        case frontAnkleAngle
+        case sideNeckAngle
+        case sideBodyAngle
+        case leftWeight
+        case rightWeight
+        case createdAt
+        case modifiedAt
     }
 
-    // 기본값 설정을 위한 초기화 메서드
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         
@@ -63,16 +62,12 @@ struct SortObject: Decodable {
     let unsorted: Bool
 }
 
-// 빈 응답을 위한 모델
-struct EmptyResponse: Decodable {}
-
-// 균형 정보 생성 요청 모델
+// CreateBalanceRequest 및 WeightRequest 모델
 struct CreateBalanceRequest: Encodable {
     let frontImgKey: String
     let sideImgKey: String
 }
 
-// 무게 정보 요청 모델
 struct WeightRequest: Encodable {
     let leftWeight: Int
     let rightWeight: Int

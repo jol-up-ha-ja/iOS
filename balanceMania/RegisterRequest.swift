@@ -1,3 +1,4 @@
+//RegisterRequest.swift
 import Foundation
 
 struct RegisterRequest: Codable {

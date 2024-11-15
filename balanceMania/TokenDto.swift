@@ -12,4 +12,11 @@ struct TokenDto: Decodable {
     let accessTokenExp: String
     let refreshToken: String
     let refreshTokenExp: String
+    
+    enum CodingKeys: String, CodingKey {
+        case accessToken = "access_token"
+        case accessTokenExp = "access_token_exp"
+        case refreshToken = "refresh_token"
+        case refreshTokenExp = "refresh_token_exp"
+    }
 }

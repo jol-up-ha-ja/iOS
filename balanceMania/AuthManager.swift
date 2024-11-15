@@ -9,7 +9,7 @@ class AuthManager: ObservableObject {
     @Published var loginStatus: String = "로그인 필요"
     @Published var accessToken: String?
 
-    private init() {  // 싱글톤 패턴이므로 private init
+    private init() {
         self.accessToken = UserDefaults.standard.string(forKey: "accessToken")
         self.loginStatus = accessToken != nil ? "로그인 완료" : "로그인 필요"
     }
@@ -53,27 +53,39 @@ class AuthManager: ObservableObject {
         self.accessToken = oauthToken.accessToken
         UserDefaults.standard.set(oauthToken.accessToken, forKey: "accessToken")
         UserDefaults.standard.set(oauthToken.refreshToken, forKey: "refreshToken")
+        UserDefaults.standard.synchronize()
         completion(true)
     }
 
     func refreshToken(completion: @escaping (Bool) -> Void) {
-        guard let refreshToken = UserDefaults.standard.string(forKey: "refreshToken") else {
-            print("갱신할 refreshToken이 없습니다.")
+        guard let storedRefreshToken = UserDefaults.standard.string(forKey: "refreshToken") else {
+            print("갱신할 refreshToken이 없습니다. 로그아웃 처리 중...")
+            logout()
             completion(false)
             return
         }
-        
-        AuthApi.shared.refreshToken(token: OAuthToken(accessToken: "", tokenType: "Bearer", refreshToken: refreshToken, scope: nil, scopes: nil)) { (oauthToken, error) in
+
+        AuthApi.shared.refreshToken { (oauthToken, error) in
             if let error = error {
-                print("토큰 갱신 실패: \(error.localizedDescription)")
+                print("토큰 갱신 실패: \(error.localizedDescription). 로그아웃 필요.")
+                self.logout()
                 completion(false)
             } else if let oauthToken = oauthToken {
-                print("토큰 갱신 성공")
+                print("✅ 토큰 갱신 성공")
                 UserDefaults.standard.set(oauthToken.accessToken, forKey: "accessToken")
                 UserDefaults.standard.set(oauthToken.refreshToken, forKey: "refreshToken")
+                UserDefaults.standard.synchronize()
                 self.accessToken = oauthToken.accessToken
                 completion(true)
             }
         }
+    }
+
+    private func logout() {
+        print("사용자 로그아웃 처리")
+        self.accessToken = nil
+        UserDefaults.standard.removeObject(forKey: "accessToken")
+        UserDefaults.standard.removeObject(forKey: "refreshToken")
+        self.loginStatus = "로그인 필요"
     }
 }

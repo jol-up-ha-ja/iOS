@@ -19,6 +19,7 @@
 		386049B12CCCF247009E6686 /* KakaoSDKTalk in Frameworks */ = {isa = PBXBuildFile; productRef = 386049B02CCCF247009E6686 /* KakaoSDKTalk */; };
 		386049B32CCCF247009E6686 /* KakaoSDKTemplate in Frameworks */ = {isa = PBXBuildFile; productRef = 386049B22CCCF247009E6686 /* KakaoSDKTemplate */; };
 		386049B52CCCF247009E6686 /* KakaoSDKUser in Frameworks */ = {isa = PBXBuildFile; productRef = 386049B42CCCF247009E6686 /* KakaoSDKUser */; };
+		38E3E1FC2CE4455D00BE3D60 /* CommonModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38E3E1FB2CE4455D00BE3D60 /* CommonModels.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -42,6 +43,7 @@
 		386049632CCCF12C009E6686 /* balanceMania.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = balanceMania.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		386049732CCCF12D009E6686 /* balanceManiaTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = balanceManiaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3860497D2CCCF12D009E6686 /* balanceManiaUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = balanceManiaUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		38E3E1FB2CE4455D00BE3D60 /* CommonModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonModels.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -115,6 +117,7 @@
 		3860495A2CCCF12C009E6686 = {
 			isa = PBXGroup;
 			children = (
+				38E3E1FB2CE4455D00BE3D60 /* CommonModels.swift */,
 				386049652CCCF12C009E6686 /* balanceMania */,
 				386049762CCCF12D009E6686 /* balanceManiaTests */,
 				386049802CCCF12D009E6686 /* balanceManiaUITests */,
@@ -291,6 +294,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				38E3E1FC2CE4455D00BE3D60 /* CommonModels.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
